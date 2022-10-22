@@ -90,7 +90,18 @@ private:
     1, 5, 2,
     2, 5, 6
   };
-
+  const glm::vec3 m_CubePositions[10] = {
+      glm::vec3(0.0f, 0.0f, 0.0f),     //
+      glm::vec3(2.0f, 5.0f, -15.0f),   //
+      glm::vec3(-1.5f, -2.2f, -2.5f),  //
+      glm::vec3(-3.8f, -2.0f, -12.3f), //
+      glm::vec3(2.4f, -0.4f, -3.5f),   //
+      glm::vec3(-1.7f, 3.0f, -7.5f),   //
+      glm::vec3(1.3f, -2.0f, -2.5f),   //
+      glm::vec3(1.5f, 2.0f, -2.5f),    //
+      glm::vec3(1.5f, 0.2f, -1.5f),    //
+      glm::vec3(-1.3f, 1.0f, -1.5f)    //
+  };
   // Cube
   std::unique_ptr<VertexArray> m_CubeVAO;
   std::unique_ptr<VertexBuffer> m_CubeVBO;
@@ -131,6 +142,7 @@ private:
 
   glm::vec3 m_LightColor = glm::vec3(1.0f, 1.0f, 1.0f);
   glm::vec3 m_LightPosition = glm::vec3(1.2f, 1.0f, 2.0f);
+  glm::vec3 m_LightDirection = glm::vec3(-0.2f, -1.0f, -0.3f);
   glm::vec3 m_LightAmbient = glm::vec3(0.2f, 0.2f, 0.2f);
   glm::vec3 m_LightDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
   glm::vec3 m_LightSpecular = glm::vec3(1.0f, 1.0f, 1.0f);

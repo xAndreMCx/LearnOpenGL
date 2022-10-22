@@ -121,12 +121,13 @@ void LightingApp::OnRender() {
 
   m_ProjectionMatrix = m_Camera.GetProjectionMatrix();
   m_ViewMatrix = m_Camera.GetViewMatrix();
-  m_ModelMatrix = glm::mat4(1.0f);
+  // m_ModelMatrix = glm::mat4(1.0f);
 
   m_CubeShader->Bind();
   m_CubeShader->SetUniformMat4f("u_ProjectionMatrix", m_ProjectionMatrix);
   m_CubeShader->SetUniformMat4f("u_ViewMatrix", m_ViewMatrix);
-  m_CubeShader->SetUniformMat4f("u_ModelMatrix", m_ModelMatrix);
+  // m_CubeShader->SetUniformMat4f("u_ModelMatrix", m_ModelMatrix);
+
 
   m_CubeShader->SetUniform1i("u_Material.Diffuse", 0);
   m_CubeShader->SetUniform1i("u_Material.Specular", 1);
@@ -135,14 +136,21 @@ void LightingApp::OnRender() {
   m_CubeShader->SetUniform3f("u_Light.Ambient", m_LightAmbient.x, m_LightAmbient.y, m_LightAmbient.z);
   m_CubeShader->SetUniform3f("u_Light.Diffuse", m_LightDiffuse.x, m_LightDiffuse.y, m_LightDiffuse.z);
   m_CubeShader->SetUniform3f("u_Light.Specular", m_LightSpecular.x, m_LightSpecular.y, m_LightSpecular.z);
-  m_CubeShader->SetUniform3f("u_Light.Position", m_LightPosition.x, m_LightPosition.y, m_LightPosition.z);
+  m_CubeShader->SetUniform3f("u_Light.Direction", m_LightDirection.x, m_LightDirection.y, m_LightDirection.z);
   m_CubeShader->SetUniform3f("u_Light.Color", m_LightColor.r, m_LightColor.g, m_LightColor.b);
 
 
   m_CubeShader->SetUniform3f("u_CameraPosition", m_Camera.GetPosition().x, m_Camera.GetPosition().y, m_Camera.GetPosition().z);
 
+  for (int i = 0; i < 10; i++) {
+    m_ModelMatrix = glm::mat4(1.0f);
+    m_ModelMatrix = glm::translate(m_ModelMatrix, m_CubePositions[i]);
+    float angle = 20.0f * i;
+    m_ModelMatrix = glm::rotate(m_ModelMatrix, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+    m_CubeShader->SetUniformMat4f("u_ModelMatrix", m_ModelMatrix);
+    m_Renderer.Draw(*m_CubeVAO, 36, *m_CubeShader);
 
-  m_Renderer.Draw(*m_CubeVAO, 36, *m_CubeShader);
+  }
 
   m_ModelMatrix = glm::mat4(1.0f);
 
@@ -158,7 +166,7 @@ void LightingApp::OnRender() {
 }
 
 void LightingApp::OnImGuiRender() {
-
+  ImGui::SliderFloat3("Light Direction", &m_LightDirection.x, -1.0f, 1.0f);
 }
 
 } // namespace Test
