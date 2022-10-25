@@ -91,17 +91,31 @@ private:
     2, 5, 6
   };
   const glm::vec3 m_CubePositions[10] = {
-      glm::vec3(0.0f, 0.0f, 0.0f),     //
-      glm::vec3(2.0f, 5.0f, -15.0f),   //
-      glm::vec3(-1.5f, -2.2f, -2.5f),  //
-      glm::vec3(-3.8f, -2.0f, -12.3f), //
-      glm::vec3(2.4f, -0.4f, -3.5f),   //
-      glm::vec3(-1.7f, 3.0f, -7.5f),   //
-      glm::vec3(1.3f, -2.0f, -2.5f),   //
-      glm::vec3(1.5f, 2.0f, -2.5f),    //
-      glm::vec3(1.5f, 0.2f, -1.5f),    //
-      glm::vec3(-1.3f, 1.0f, -1.5f)    //
+    glm::vec3(0.0f, 0.0f, 0.0f),     //
+    glm::vec3(2.0f, 5.0f, -15.0f),   //
+    glm::vec3(-1.5f, -2.2f, -2.5f),  //
+    glm::vec3(-3.8f, -2.0f, -12.3f), //
+    glm::vec3(2.4f, -0.4f, -3.5f),   //
+    glm::vec3(-1.7f, 3.0f, -7.5f),   //
+    glm::vec3(1.3f, -2.0f, -2.5f),   //
+    glm::vec3(1.5f, 2.0f, -2.5f),    //
+    glm::vec3(1.5f, 0.2f, -1.5f),    //
+    glm::vec3(-1.3f, 1.0f, -1.5f)    //
   };
+  glm::vec3 m_PointLightPositions[4] = {
+    glm::vec3( 0.7f,  0.2f,  2.0f),
+    glm::vec3( 2.3f, -3.3f, -4.0f),
+    glm::vec3(-4.0f,  2.0f, -12.0f),
+    glm::vec3( 0.0f,  0.0f, -3.0f)
+  };
+  glm::vec3 m_PointLightAttenuation[4] = {
+    //        const linear quadratic
+    glm::vec3(1.0f, 0.09f, 0.032f),
+    glm::vec3(1.0f, 0.09f, 0.032f),
+    glm::vec3(1.0f, 0.09f, 0.032f),
+    glm::vec3(1.0f, 0.09f, 0.032f)
+  };
+
   // Cube
   std::unique_ptr<VertexArray> m_CubeVAO;
   std::unique_ptr<VertexBuffer> m_CubeVBO;
@@ -137,15 +151,16 @@ private:
   static float m_LastX;
   static float m_LastY;
 
-  glm::vec3 m_MaterialSpecular = glm::vec3(0.5f, 0.5f, 0.5f);
+  glm::vec3 m_Ambient = glm::vec3(0.2f, 0.2f, 0.2f);
+  glm::vec3 m_Diffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+  glm::vec3 m_Specular = glm::vec3(1.0f, 1.0f, 1.0f);
+
+  glm::vec3 m_DirectionalLightDirection = glm::vec3(-0.2f, 3.0f, 0.3f);
+
   float m_MaterialShininess = 32.0f;
 
-  glm::vec3 m_LightColor = glm::vec3(1.0f, 1.0f, 1.0f);
   glm::vec3 m_LightPosition = glm::vec3(1.2f, 1.0f, 2.0f);
-  glm::vec3 m_LightDirection = glm::vec3(-0.2f, -1.0f, -0.3f);
-  glm::vec3 m_LightAmbient = glm::vec3(0.2f, 0.2f, 0.2f);
-  glm::vec3 m_LightDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
-  glm::vec3 m_LightSpecular = glm::vec3(1.0f, 1.0f, 1.0f);
+
 
   void processInput(GLFWwindow* window);
   static void cursor_callback(GLFWwindow* window, double xpos, double ypos);

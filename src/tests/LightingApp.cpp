@@ -126,21 +126,43 @@ void LightingApp::OnRender() {
   m_CubeShader->Bind();
   m_CubeShader->SetUniformMat4f("u_ProjectionMatrix", m_ProjectionMatrix);
   m_CubeShader->SetUniformMat4f("u_ViewMatrix", m_ViewMatrix);
-  // m_CubeShader->SetUniformMat4f("u_ModelMatrix", m_ModelMatrix);
 
+  m_CubeShader->SetUniform1i("u_Material.diffuse", 0);
+  m_CubeShader->SetUniform1i("u_Material.specular", 1);
+  m_CubeShader->SetUniform1f("u_Material.shininess", m_MaterialShininess);
 
-  m_CubeShader->SetUniform1i("u_Material.Diffuse", 0);
-  m_CubeShader->SetUniform1i("u_Material.Specular", 1);
-  m_CubeShader->SetUniform1f("u_Material.Shininess", m_MaterialShininess);
+  // Directional Light
+  m_CubeShader->SetUniform3f("u_DirectionalLight.direction", m_DirectionalLightDirection);
 
-  m_CubeShader->SetUniform3f("u_Light.Ambient", m_LightAmbient.x, m_LightAmbient.y, m_LightAmbient.z);
-  m_CubeShader->SetUniform3f("u_Light.Diffuse", m_LightDiffuse.x, m_LightDiffuse.y, m_LightDiffuse.z);
-  m_CubeShader->SetUniform3f("u_Light.Specular", m_LightSpecular.x, m_LightSpecular.y, m_LightSpecular.z);
-  m_CubeShader->SetUniform3f("u_Light.Direction", m_LightDirection.x, m_LightDirection.y, m_LightDirection.z);
-  m_CubeShader->SetUniform3f("u_Light.Color", m_LightColor.r, m_LightColor.g, m_LightColor.b);
+  m_CubeShader->SetUniform3f("u_DirectionalLight.ambient", m_Ambient);
+  m_CubeShader->SetUniform3f("u_DirectionalLight.diffuse", m_Diffuse);
+  m_CubeShader->SetUniform3f("u_DirectionalLight.specular", m_Specular);
 
+  // Point Lights
+  for (int i = 0; i < 4; i++) {
+    m_CubeShader->SetUniform3f("u_PointLights[" + std::to_string(i) + "].ambient", m_Ambient);
+    m_CubeShader->SetUniform3f("u_PointLights[" + std::to_string(i) + "].diffuse", m_Diffuse);
+    m_CubeShader->SetUniform3f("u_PointLights[" + std::to_string(i) + "].specular", m_Specular);
 
-  m_CubeShader->SetUniform3f("u_CameraPosition", m_Camera.GetPosition().x, m_Camera.GetPosition().y, m_Camera.GetPosition().z);
+    m_CubeShader->SetUniform3f("u_PointLights[" + std::to_string(i) + "].position", m_PointLightPositions[i]);
+
+    m_CubeShader->SetUniform1f("u_PointLights[" + std::to_string(i) + "].constant", m_PointLightAttenuation[i].x);
+    m_CubeShader->SetUniform1f("u_PointLights[" + std::to_string(i) + "].linear", m_PointLightAttenuation[i].y);
+    m_CubeShader->SetUniform1f("u_PointLights[" + std::to_string(i) + "].quadratic", m_PointLightAttenuation[i].z);
+  }
+
+  // Spot Lights
+  m_CubeShader->SetUniform3f("u_SpotLight.ambient", m_Ambient);
+  m_CubeShader->SetUniform3f("u_SpotLight.diffuse", m_Diffuse);
+  m_CubeShader->SetUniform3f("u_SpotLight.specular", m_Specular);
+
+  m_CubeShader->SetUniform3f("u_SpotLight.position", m_Camera.GetPosition());
+  m_CubeShader->SetUniform3f("u_SpotLight.direction", m_Camera.GetFront());
+
+  m_CubeShader->SetUniform1f("u_SpotLight.innerCutOff", glm::cos(glm::radians(12.5f)));
+  m_CubeShader->SetUniform1f("u_SpotLight.outerCutOff", glm::cos(glm::radians(17.5f)));
+
+  m_CubeShader->SetUniform3f("u_CameraPosition", m_Camera.GetPosition());
 
   for (int i = 0; i < 10; i++) {
     m_ModelMatrix = glm::mat4(1.0f);
@@ -157,16 +179,44 @@ void LightingApp::OnRender() {
   m_LightShader->Bind();
   m_LightShader->SetUniformMat4f("u_ProjectionMatrix", m_ProjectionMatrix);
   m_LightShader->SetUniformMat4f("u_ViewMatrix", m_ViewMatrix);
-  m_ModelMatrix = glm::translate(m_ModelMatrix, m_LightPosition);
-  m_ModelMatrix = glm::scale(m_ModelMatrix, glm::vec3(0.2f));
-  m_LightShader->SetUniformMat4f("u_ModelMatrix", m_ModelMatrix);
-  m_LightShader->SetUniform3f("u_LightColor", m_LightColor.r, m_LightColor.g, m_LightColor.b);
 
-  m_Renderer.Draw(*m_LightVAO, *m_LightEBO, *m_LightShader);
+  for (int i = 0; i < 4; i++) {
+    m_ModelMatrix = glm::mat4(1.0f);
+    m_ModelMatrix = glm::translate(m_ModelMatrix, m_PointLightPositions[i]);
+    m_ModelMatrix = glm::scale(m_ModelMatrix, glm::vec3(0.2f));
+    m_LightShader->SetUniformMat4f("u_ModelMatrix", m_ModelMatrix);
+    m_Renderer.Draw(*m_LightVAO, *m_LightEBO, *m_LightShader);
+  }
+
 }
 
 void LightingApp::OnImGuiRender() {
-  ImGui::SliderFloat3("Light Direction", &m_LightDirection.x, -1.0f, 1.0f);
+  if (ImGui::CollapsingHeader("Light")) {
+    if (ImGui::CollapsingHeader("Directional Light")) {
+      ImGui::SliderFloat3("Direction", &m_DirectionalLightDirection.x, -5, 5);
+      ImGui::Separator();
+    }
+    if (ImGui::CollapsingHeader("Point Lights")) {
+      for (int i = 0; i < 4; i++) {
+        if (ImGui::TreeNode((void*)(intptr_t)i, "Light %d", i+1)) {
+            ImGui::SliderFloat3("Position", &m_PointLightPositions[i].x, -5.0f, 5.0f);
+            ImGui::SliderFloat("Constant", &m_PointLightAttenuation[i].x, 0.0f, 5.0f);
+            ImGui::SliderFloat("Linear", &m_PointLightAttenuation[i].y, 0.0f, 2.5f);
+            ImGui::SliderFloat("Quadratic", &m_PointLightAttenuation[i].z, 0.0f, 2.5f);
+          ImGui::TreePop();
+        }
+      }
+      ImGui::Separator();
+    }
+    ImGui::Spacing();
+
+    ImGui::SliderFloat3("Ambient", &m_Ambient.x, -5, 5);
+    ImGui::SliderFloat3("Diffuse", &m_Diffuse.x, -5, 5);
+    ImGui::SliderFloat3("Specular", &m_Specular.x, -5, 5);
+  }
+    if (ImGui::CollapsingHeader("Material")) { 
+      ImGui::SliderFloat("Shininess", &m_MaterialShininess, -5, 5);
+    }
 }
 
 } // namespace Test
