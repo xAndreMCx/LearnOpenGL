@@ -105,8 +105,8 @@ int main(int argc, char** argv) {
             delete currentApp;
             currentApp = menu;
           }
-          ImGui::SameLine();
-          ImGui::SliderFloat("Delta Time", &deltaTime, 0.0f, 0.5f);
+          // ImGui::SameLine();
+          // ImGui::SliderFloat("Delta Time", &deltaTime, 0.0f, 0.5f);
         }
 
         currentApp->OnImGuiRender();
